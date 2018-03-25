@@ -7,16 +7,17 @@ function imageArray = imageProcessing(filePath)
       if(regexp(dirName, '^\w+'))
           dirPath = strcat(filePath, '/', dirName);
           ImageFiles = dir(dirPath);
-          for j = 2001:length(ImageFiles)
+          for j = 3:500
               imageName = ImageFiles(j).name;
               imgPath = strcat(dirPath, '/', imageName);
               RGB = imread(imgPath);
-              RGBResize = imresize(RGB, [480, 480]);
+              RGBResize = imresize(RGB, 0.40);
               BW = rgb2gray(RGBResize);
+              BW = double(BW);
               images = [images; BW(:)'];
               disp(j)
               end
-              MatFilePath = strcat(filePath, '/' , strcat(dirName, int2str(5), '.mat'));
+              MatFilePath = strcat(filePath, '/' , strcat(dirName, int2str(1), '.mat'));
               save(MatFilePath, 'images');
               images = [];
          end

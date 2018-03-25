@@ -1,8 +1,9 @@
 pkg load image;
 more off;
-trainDataPath = 'C:/Users/aravi/Documents/Aravind/StateFarmNeuralNetwork/StateFarm/Images/train';
 
+trainImagesPath = 'C:/Users/aravi/Documents/Aravind/StateFarmNeuralNetwork/StateFarm/Images/train';
+dataPath = 'C:/Users/aravi/Documents/Aravind/StateFarmNeuralNetwork/StateFarm/Data'
 % Process Images
 printf('Processing Images...\n')
 
-images = imageProcessing(trainDataPath);
+images = imageProcessing(trainImagesPath);
