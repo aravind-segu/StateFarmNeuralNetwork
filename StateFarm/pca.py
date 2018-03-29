@@ -4,7 +4,7 @@ import matplotlib.pyplot as plot
 import os
 from PIL import Image
 
-def fsvd(X, k, i):
+def fsvd(X, k,i):
     if (X.shape[0] < X.shape[1]):
         X = np.transpose(X)
         isTransposed = True
@@ -14,7 +14,6 @@ def fsvd(X, k, i):
     n = X.shape[1]
     l = k + 2
     G = np.random.randn(n, l)
-
 
     prev = X.dot(G)
     H = np.array(prev)
@@ -38,7 +37,7 @@ def fsvd(X, k, i):
         U = Ut[:,0:k]
         V = Vt[:,0:k]
     S = np.diag(St)
-    S = S[0:k,0:k
+    S = S[0:k,0:k]
     return (U, S, V)
 
 
@@ -47,15 +46,19 @@ def pca(X):
     transposeX = X.T
     (m,n) = X.shape
     (mT, nT) = transposeX.shape
-    print(mT)
-    result = np.zeros(shape=(1000, n))
-    for i in range(0, 1000):
-        print (i+3000)
-        for j in range(0, result.shape[1]):
-            row = transposeX[i+3000]
-            column = X[:,j]
-            result[i,j] = row.dot(column)
-    io.savemat('result3.mat', {'result': result})
+    covariance = transposeX.dot(X)
+    [U, S, V] = np.linalg.svd(covariance)
+    # print(mT)
+    # result = np.zeros(shape=(1000, n))
+    # for i in range(0, 1000):
+    #     print (i+3000)
+    #     for j in range(0, result.shape[1]):
+    #         row = transposeX[i+3000]
+    #         column = X[:,j]
+    #         result[i,j] = row.dot(column)
+    io.savemat('U.mat', {'U': U})
+    io.savemat('S.mat', {'S': S})
+    io.savemat('V.mat', {'V': V})
 
 def normalize(X):
     mu = np.mean(X, axis=0)
@@ -63,7 +66,7 @@ def normalize(X):
     X = (X - mu) / sigma
     return X
 
-data = io.loadmat('./Data/c0.mat')
+data = io.loadmat('./c0.mat')
 images = data['images']
 images = np.array(images)
 [U, S, V] = pca(images)
