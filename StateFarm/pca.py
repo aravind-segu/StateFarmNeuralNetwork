@@ -4,6 +4,9 @@ import matplotlib.pyplot as plot
 import os
 from PIL import Image
 
+def rgbToGray(rgb):
+    return np.dot(rgb[...,:3], [0.299, 0.597, 0.114])
+
 def fsvd(X, k,i):
     if (X.shape[0] < X.shape[1]):
         X = np.transpose(X)
@@ -41,24 +44,20 @@ def fsvd(X, k,i):
     return (U, S, V)
 
 
-def pca(X):
+def projectData(X, U, k):
+    return X.dot(U[:,1:k])
+
+def pca(X, fileNum):
     X = normalize(X)
     transposeX = X.T
     (m,n) = X.shape
     (mT, nT) = transposeX.shape
     covariance = transposeX.dot(X)
+    covariance = covariance/m
     [U, S, V] = np.linalg.svd(covariance)
-    # print(mT)
-    # result = np.zeros(shape=(1000, n))
-    # for i in range(0, 1000):
-    #     print (i+3000)
-    #     for j in range(0, result.shape[1]):
-    #         row = transposeX[i+3000]
-    #         column = X[:,j]
-    #         result[i,j] = row.dot(column)
-    io.savemat('U.mat', {'U': U})
-    io.savemat('S.mat', {'S': S})
-    io.savemat('V.mat', {'V': V})
+    Z = projectData(X, U, 1024)
+    io.savemat('z' + str(fileNum) + '.mat', {'z': Z})
+
 
 def normalize(X):
     mu = np.mean(X, axis=0)
@@ -69,9 +68,4 @@ def normalize(X):
 data = io.loadmat('./c0.mat')
 images = data['images']
 images = np.array(images)
-[U, S, V] = pca(images)
-img1 = (U.dot(S)).dot(V.T)
-
-plot.imshow(img1)
-plot.show()
-print(images.shape[0])
+pca(images, 0)

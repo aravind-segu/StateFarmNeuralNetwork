@@ -17,11 +17,9 @@ for file in os.listdir(basePath):
     for imageFile in os.listdir(dirPath):
         img = Image.open(dirPath + '/' + imageFile)
         newHeight = int((newWidth / float(img.size[0])) * float(img.size[1]))
-        img = img.resize((newWidth, newHeight), Image.ANTIALIAS)
+        img = img.resize((100, 100), Image.ANTIALIAS)
         image = np.array(img)
         gray = rgbToGray(image)
-        # plot.imshow(gray, cmap='gray')
-        # plot.show()
         gray = gray.ravel()
         images.append(gray)
         i += 1
