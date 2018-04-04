@@ -65,7 +65,17 @@ def normalize(X):
     X = (X - mu) / sigma
     return X
 
-data = io.loadmat('./c0.mat')
-images = data['images']
-images = np.array(images)
-pca(images, 0)
+# data = io.loadmat('./c0.mat')
+# images = data['images']
+# images = np.array(images)
+# pca(images, 0)
+
+data = io.loadmat('./S.mat')
+S = data['S']
+sum = np.sum(S, axis = 1)
+for i in range(0, S.shape[1]):
+    localSum = np.sum(S[:,0:i], axis=1)
+    div = localSum / sum
+    if (div >=  0.99):
+        print i
+
