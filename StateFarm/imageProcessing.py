@@ -25,3 +25,4 @@ for file in os.listdir(basePath):
         i += 1
         print (i)
     io.savemat(file + '.mat', {'images': images})
+    images = []
