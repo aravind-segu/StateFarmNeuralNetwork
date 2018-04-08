@@ -3,12 +3,12 @@ import math
 from StateFarm.util.sigmoid import sigmoid
 from scipy import io
 
-def costFunction(parameters, inputLayerSize, hiddenLayerSize, outputLayerSize, X, y):
+def costFunction(parameters, inputLayerSize, hiddenLayerSize, outputLayerSize, X, y, lambdaVal):
     theta1Total = hiddenLayerSize * (inputLayerSize + 1)
     theta2Total = outputLayerSize * (hiddenLayerSize + 1)
 
     theta1 = np.reshape(parameters[0:theta1Total], (hiddenLayerSize, (inputLayerSize + 1)), order="F")
-    theta2 = np.reshape(parameters[theta1Total:parameters.shape[0]], (outputLayerSize, (hiddenLayerSize + 1)), order="F")
+    theta2 = np.reshape(parameters[theta1Total:], (outputLayerSize, (hiddenLayerSize + 1)), order="F")
 
     m = X.shape[0]
 
@@ -27,6 +27,9 @@ def costFunction(parameters, inputLayerSize, hiddenLayerSize, outputLayerSize, X
 
     sumOverNodes = np.sum((reshapeY * np.log(h)) + ((1 - reshapeY) * np.log(1 - h)),axis=1)
     cost = -1 * np.sum(sumOverNodes, axis=0) / m
+
+    regularization = (sum(sum(theta1[:,1:] * theta1[:,1:])) + sum(sum(theta2[:,1:] * theta2[:,1:]))) * lambdaVal / (2 * m)
+    cost = cost + regularization
     print(cost)
 
 def CostFunctionTest():
@@ -41,6 +44,6 @@ def CostFunctionTest():
     theta2 = (theta2.T).ravel()
     params = np.concatenate((theta1, theta2), axis=0)
 
-    costFunction(params, 400, 25, 10, X, y)
+    costFunction(params, 400, 25, 10, X, y, 1)
 
 CostFunctionTest()
