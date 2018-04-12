@@ -1,6 +1,6 @@
-import numpy as  np
+import numpy as np
 import math
-from StateFarm.util.sigmoid import sigmoid
+from sigmoid import sigmoid
 from scipy import io
 
 def costFunction(parameters, inputLayerSize, hiddenLayerSize, outputLayerSize, X, y, lambdaVal):

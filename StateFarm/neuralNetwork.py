@@ -15,7 +15,7 @@ def loadAllData(folderName):
         data = io.loadmat(filePath)
         currentData = np.array(data['z'])
         numOfRows = currentData.shape[0]
-        trainRows = math.ceil(numOfRows * 0.8)
+        trainRows = int(math.ceil(numOfRows * 0.8))
 
         X = np.concatenate((X, currentData[0:trainRows, :]), axis=0)
         Xcv = np.concatenate((Xcv, currentData[trainRows:numOfRows, :]), axis=0)
@@ -29,4 +29,10 @@ def loadAllData(folderName):
 
     return(X, Xcv, Y, Ycv)
 
-(X, Xcv, Y, Ycv) = loadAllData('z')
+
+
+def randomInitialization(rows, cols, epsilon):
+    randomArray = np.random.rand(rows, cols)
+    return (randomArray * 2 * epsilon) - epsilon
+
+
