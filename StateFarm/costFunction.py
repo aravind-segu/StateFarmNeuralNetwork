@@ -1,6 +1,6 @@
 import numpy as np
 import math
-from sigmoid import sigmoid
+from sigmoid import sigmoid, sigmoidDerivative
 from scipy import io
 
 def costFunction(parameters, inputLayerSize, hiddenLayerSize, outputLayerSize, X, y, lambdaVal):
@@ -30,6 +30,18 @@ def costFunction(parameters, inputLayerSize, hiddenLayerSize, outputLayerSize, X
 
     regularization = (sum(sum(theta1[:,1:] * theta1[:,1:])) + sum(sum(theta2[:,1:] * theta2[:,1:]))) * lambdaVal / (2 * m)
     cost = cost + regularization
+
+    ##########################
+    #####Back Propogation#####
+    ##########################
+    theta1Grad = np.zeros(theta1.shape, dtype=int)
+    theta2Grad = np.zeros(theta2.shape, dtype=int)
+
+    deltaThree = h - y
+    deltaTwo = deltaThree.dot(theta2) * sigmoidDerivative(np.concatenate((np.ones((m, 1), dtype=int), z2), axis=1))
+
+    theta1Grad = theta1Grad + np.transpose(deltaTwo[:,1:]).dot(X)
+    theta2Grad = theta2Grad + np.transpose(deltaThree).dot(a2)
     print(cost)
 
 def CostFunctionTest():
