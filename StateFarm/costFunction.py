@@ -41,7 +41,12 @@ def costFunction(parameters, inputLayerSize, hiddenLayerSize, outputLayerSize, X
     deltaTwo = deltaThree.dot(theta2) * sigmoidDerivative(np.concatenate((np.ones((m, 1), dtype=int), z2), axis=1))
 
     theta1Grad = theta1Grad + np.transpose(deltaTwo[:,1:]).dot(X)
+    theta1Grad = theta1Grad / m
+    theta1Grad[:,1:] = theta1Grad[:,1:] + [(lambdaVal / m) * theta1[:,1:]]
+
     theta2Grad = theta2Grad + np.transpose(deltaThree).dot(a2)
+    theta2Grad = theta2Grad / m
+    theta2Grad[:,1:] = theta2Grad[:,1:] + [(lambdaVal / m) * theta2[:,1:]]
     print(cost)
 
 def CostFunctionTest():
