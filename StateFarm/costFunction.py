@@ -3,64 +3,96 @@ import math
 from sigmoid import sigmoid, sigmoidDerivative
 from scipy import io
 
-def costFunction(parameters, inputLayerSize, hiddenLayerSize, outputLayerSize, X, y, lambdaVal):
-    theta1Total = hiddenLayerSize * (inputLayerSize + 1)
-    theta2Total = outputLayerSize * (hiddenLayerSize + 1)
+def forwardPropogation (a, theta, m, currentIter, allA, allZ):
+    if (currentIter >= len(theta)):
+        return (a, allA, allZ)
+    a = np.concatenate((np.ones((m,1), dtype=int), a), axis=1)
+    z = a.dot(np.transpose(theta[currentIter]))
+    a2 = sigmoid(z)
+    allA.append(a2)
+    allZ.append(z)
+    return forwardPropogation(a2, theta, m, currentIter + 1, allA, allZ)
 
-    theta1 = np.reshape(parameters[0:theta1Total], (hiddenLayerSize, (inputLayerSize + 1)), order="F")
-    theta2 = np.reshape(parameters[theta1Total:], (outputLayerSize, (hiddenLayerSize + 1)), order="F")
+def backPropogation(allA, allZ, theta, lambdaVal, h, y, layers, m):
+    delta = [0] * layers
+    delta[layers-1] = h - y
+    i = layers - 2
+    while (i > 0):
+        delta[i] = deltaCalculation(theta[i], delta[i+1], allZ[i - 1])
+        i -= 1
+    thetaGrad = [0] * (layers - 1)
+    for i in range(0, layers - 1):
+        currThetaGrad = 0
+        a = np.concatenate((np.ones((allA[i].shape[0], 1), dtype=int), allA[i]), axis=1)
+        if (i == 0):
+            currThetaGrad = thetaGrad[i] + np.transpose(delta[i + 1][:,1:]).dot(a)
+        else:
+            currThetaGrad = thetaGrad[i] + np.transpose(delta[i + 1]).dot(a)
+        currThetaGrad = currThetaGrad / m
+        currThetaGrad[:,1:] = currThetaGrad[:,1:] + ((float(lambdaVal) / float(m)) * theta[i][:,1:])
+        thetaGrad[i] = currThetaGrad
+    return thetaGrad
+
+def deltaCalculation(theta, prevDelta, z):
+    z = np.concatenate((np.ones((z.shape[0], 1), dtype=int), z), axis = 1)
+    return prevDelta.dot(theta) * sigmoidDerivative(z)
+
+def costFunction(parameters, layers, X, y, lambdaVal):
+    thetaSizes = []
+    for i in range(0, len(layers) - 1):
+        thetaSizes.append(layers[i + 1] *(layers[i] + 1))
+
+    theta = []
+    for i in range(0, len(thetaSizes)):
+        startLength = 0 if (i == 0) else thetaSizes[i-1]
+        theta.append(np.reshape(parameters[startLength:startLength + thetaSizes[i]], (layers[i + 1], (layers[i] + 1)), order = "F"))
 
     m = X.shape[0]
 
-    reshapeY = np.zeros((m, outputLayerSize), dtype=int)
+    reshapeY = np.zeros((m, layers[len(layers) - 1]), dtype=int)
     for i in range(0,m):
-        reshapeY[i, y[i,0]-1] = 1
+        reshapeY[i, int(y[i,0]-1)] = 1
 
-    X = np.concatenate((np.ones((m,1), dtype=int), X), axis=1)
-    z2 = X.dot(np.transpose(theta1))
-    a2 = sigmoid(z2)
-
-    a2 = np.concatenate((np.ones((m, 1), dtype=int), a2), axis=1)
-    z3 = a2.dot(np.transpose(theta2))
-
-    h = sigmoid(z3)
+    [h, allA, allZ] = forwardPropogation(X, theta, m, 0, [X], [])
 
     sumOverNodes = np.sum((reshapeY * np.log(h)) + ((1 - reshapeY) * np.log(1 - h)),axis=1)
     cost = -1 * np.sum(sumOverNodes, axis=0) / m
 
-    regularization = (sum(sum(theta1[:,1:] * theta1[:,1:])) + sum(sum(theta2[:,1:] * theta2[:,1:]))) * lambdaVal / (2 * m)
+    regularization = 0
+    for currTheta in theta:
+        regularization += (sum(sum(currTheta[:,1:] * currTheta[:,1:])))
+    regularization = regularization * (float(lambdaVal) / (2*float(m)))
     cost = cost + regularization
 
     ##########################
     #####Back Propogation#####
     ##########################
-    theta1Grad = np.zeros(theta1.shape, dtype=int)
-    theta2Grad = np.zeros(theta2.shape, dtype=int)
+    thetaGrad = []
+    for currTheta in theta:
+        thetaGrad.append(np.zeros(currTheta.shape, dtype=int))
 
-    deltaThree = h - y
-    deltaTwo = deltaThree.dot(theta2) * sigmoidDerivative(np.concatenate((np.ones((m, 1), dtype=int), z2), axis=1))
-
-    theta1Grad = theta1Grad + np.transpose(deltaTwo[:,1:]).dot(X)
-    theta1Grad = theta1Grad / m
-    theta1Grad[:,1:] = theta1Grad[:,1:] + [(lambdaVal / m) * theta1[:,1:]]
-
-    theta2Grad = theta2Grad + np.transpose(deltaThree).dot(a2)
-    theta2Grad = theta2Grad / m
-    theta2Grad[:,1:] = theta2Grad[:,1:] + [(lambdaVal / m) * theta2[:,1:]]
+    thetaGrad = backPropogation(allA, allZ, theta, lambdaVal, h, reshapeY, len(layers), m)
     print(cost)
+    thetaGradList = [thetaGrad[0].T.ravel(), thetaGrad[1].T.ravel()]
+    print thetaGradList
+    io.savemat('thetaGrad.mat', {'thetaGrad1': thetaGradList[0], 'thetaGrad2': thetaGradList[1]})
 
 def CostFunctionTest():
-    data = io.loadmat('TestData/ex4data1.mat')
+    # data = io.loadmat('TestData/ex4data1.mat')
+    # X = data['X']
+    # y = data['y']
+
+    # data = io.loadmat('TestData/ex4weights.mat')
+    # theta1 = data['Theta1']
+    # theta2 = data['Theta2']
+    # theta1 = (theta1.T).ravel()
+    # theta2 = (theta2.T).ravel()
+    data = io.loadmat('vars.mat',  struct_as_record=True)
+    # params = np.concatenate((theta1, theta2), axis=0)
+    params = data['nn_params']
     X = data['X']
     y = data['y']
 
-    data = io.loadmat('TestData/ex4weights.mat')
-    theta1 = data['Theta1']
-    theta2 = data['Theta2']
-    theta1 = (theta1.T).ravel()
-    theta2 = (theta2.T).ravel()
-    params = np.concatenate((theta1, theta2), axis=0)
+    costFunction(params, [3,5,3] , X, y, 3)
 
-    costFunction(params, 400, 25, 10, X, y, 1)
-
-CostFunctionTest()
+CostFunctionTest(),
