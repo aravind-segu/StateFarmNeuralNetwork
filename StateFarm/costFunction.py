@@ -56,8 +56,10 @@ def costFunction(parameters, layers, X, y, lambdaVal):
     [h, allA, allZ] = forwardPropogation(X, theta, m, 0, [X], [])
 
     sumOverNodes = np.sum((reshapeY * np.log(h)) + ((1 - reshapeY) * np.log(1 - h)),axis=1)
-    cost = -1 * np.sum(sumOverNodes, axis=0) / m
-
+    cost = 1
+    # print bool(np.log(1-h)[0][0]
+    if np.sum(reshapeY * np.log(h)) != 0:
+      cost = -1 * np.sum(sumOverNodes, axis=0) / m
     regularization = 0
     for currTheta in theta:
         regularization += (sum(sum(currTheta[:,1:] * currTheta[:,1:])))
@@ -72,11 +74,8 @@ def costFunction(parameters, layers, X, y, lambdaVal):
         thetaGrad.append(np.zeros(currTheta.shape, dtype=int))
 
     thetaGrad = backPropogation(allA, allZ, theta, lambdaVal, h, reshapeY, len(layers), m)
-    print(cost)
-    thetaGradList = [thetaGrad[0].T.ravel(), thetaGrad[1].T.ravel()]
-    print thetaGradList
-    io.savemat('thetaGrad.mat', {'thetaGrad1': thetaGradList[0], 'thetaGrad2': thetaGradList[1]})
-
+    resultTheta = np.concatenate((thetaGrad[0].T.ravel(), thetaGrad[1].T.ravel()), axis=0)
+    return (cost, resultTheta)
 def CostFunctionTest():
     # data = io.loadmat('TestData/ex4data1.mat')
     # X = data['X']
@@ -95,4 +94,4 @@ def CostFunctionTest():
 
     costFunction(params, [3,5,3] , X, y, 3)
 
-CostFunctionTest(),
+# CostFunctionTest()
