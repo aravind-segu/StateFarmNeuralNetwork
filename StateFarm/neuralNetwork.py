@@ -49,8 +49,9 @@ numLabels = 10
 layers = [inputLayerSize, hiddenLayerSize, numLabels]
 lambdaVal = 1
 
-theta1 = randomInitialization(hiddenLayerSize, inputLayerSize + 1, 0.12)
-theta2 = randomInitialization(numLabels, hiddenLayerSize + 1, 0.12)
+data = io.loadmat('./thetaPrediction.mat')
+theta1 = data['theta1']
+theta2 = data['theta2']
 
 params = np.concatenate((theta1.T.ravel(), theta2.T.ravel()), axis=0)
 cost = 1
@@ -61,13 +62,35 @@ while True:
     theta1 = theta1 - alpha * resultTheta[0]
     theta2 = theta2 - alpha * resultTheta[1]
     params = np.concatenate((theta1.T.ravel(), theta2.T.ravel()), axis=0)
-    if (cost < 1):
-        io.savemat('thetaPrediction.mat', {'theta1': theta1, 'theta2': theta2})
-        alpha = 0.02
+    # if (cost < 1):
+    #     io.savemat('thetaPrediction.mat', {'theta1': theta1, 'theta2': theta2})
+    #     alpha = 0.02
     # if (cost < 1):
     #     prediction = predict(theta1, theta2, Xcv)
     #     print(np.mean(np.equal(prediction, Ycv).astype(int)))
-    if (cost < 0.4):
-        io.savemat('thetaPrediction.mat', {'theta1': theta1, 'theta2': theta2})
+    if (cost == 0.3):
+        io.savemat('thetaPrediction03.mat', {'theta1': theta1, 'theta2': theta2})
+    if (cost == 0.35):
+        io.savemat('thetaPrediction035.mat', {'theta1': theta1, 'theta2': theta2})
+    if (cost == 0.25):
+        io.savemat('thetaPrediction025.mat', {'theta1': theta1, 'theta2': theta2})
+    if (cost == 0.20):
+        io.savemat('thetaPrediction20.mat', {'theta1': theta1, 'theta2': theta2})
+    if (cost == 0.10):
+        io.savemat('thetaPrediction10.mat', {'theta1': theta1, 'theta2': theta2})
+    if (cost == 0.15):
+        io.savemat('thetaPrediction15.mat', {'theta1': theta1, 'theta2': theta2})
+    if (cost == 0.08):
+        io.savemat('thetaPrediction08.mat', {'theta1': theta1, 'theta2': theta2})
+    if (cost == 0.06):
+        io.savemat('thetaPrediction06.mat', {'theta1': theta1, 'theta2': theta2})
+    if (cost == 0.04):
+        io.savemat('thetaPrediction04.mat', {'theta1': theta1, 'theta2': theta2})
+    if (cost == 0.02):
+        io.savemat('thetaPrediction02.mat', {'theta1': theta1, 'theta2': theta2})
+    if (cost == 0.01):
+        io.savemat('thetaPrediction01.mat', {'theta1': theta1, 'theta2': theta2})
+    if (cost < 0.2):
+        io.savemat('thetaPrediction2.mat', {'theta1': theta1, 'theta2': theta2})
     print (cost)
     print("===========================================")
