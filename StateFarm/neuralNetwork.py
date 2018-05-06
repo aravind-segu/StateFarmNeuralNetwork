@@ -90,7 +90,6 @@ while True:
         io.savemat('thetaPrediction02.mat', {'theta1': theta1, 'theta2': theta2})
     if (cost == 0.01):
         io.savemat('thetaPrediction01.mat', {'theta1': theta1, 'theta2': theta2})
-    if (cost < 0.2):
-        io.savemat('thetaPrediction2.mat', {'theta1': theta1, 'theta2': theta2})
+        break
     print (cost)
     print("===========================================")
